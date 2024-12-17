@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.CQRS;
+using Catalog.API.Models;
 
 namespace Catalog.API.Products.CreateProduct;
 
@@ -10,7 +11,20 @@ internal class CreateProductCommandHandler : ICommandHandler<CreateProductComman
 {
     public Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
     {
-        //Business logic to Creatre a product
+        //Create product entity from command object
+        var product = new Product
+        {
+            Name = command.Name,
+            Category = command.Category,
+            Description = command.Description,
+            ImageFile = command.ImageFile,
+            Price = command.Price,
+        };
+
+        //Save to db
+
+        //Return CreateProductResult result
+        //return new CreateProductResult(Guid.NewGuid());
         throw new NotImplementedException();
     }
 }
