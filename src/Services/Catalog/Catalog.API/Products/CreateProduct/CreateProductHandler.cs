@@ -1,5 +1,6 @@
 ﻿using BuildingBlocks.CQRS;
 using Catalog.API.Models;
+using Marten;
 
 namespace Catalog.API.Products.CreateProduct;
 
@@ -7,9 +8,9 @@ public record CreateProductCommand(string Name, List<string> Category, string De
     : ICommand<CreateProductResult>;
 public record CreateProductResult(Guid Id);
 
-internal class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, CreateProductResult>
+internal class CreateProductCommandHandler(IDocumentSession session) : ICommandHandler<CreateProductCommand, CreateProductResult>
 {
-    public Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
+    public async Task<CreateProductResult> Handle(CreateProductCommand command, CancellationToken cancellationToken)
     {
         //Create product entity from command object
         var product = new Product
@@ -22,9 +23,10 @@ internal class CreateProductCommandHandler : ICommandHandler<CreateProductComman
         };
 
         //Save to db
+        session.Store(product);
+        await session.SaveChangesAsync(cancellationToken);
 
         //Return CreateProductResult result
-        //return new CreateProductResult(Guid.NewGuid());
-        throw new NotImplementedException();
+        return new CreateProductResult(product.Id);
     }
 }
